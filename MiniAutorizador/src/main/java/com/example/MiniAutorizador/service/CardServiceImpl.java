@@ -8,6 +8,7 @@ import com.example.MiniAutorizador.repository.CardRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,10 +20,24 @@ public class CardServiceImpl implements CardService {
 
     @Autowired
     private  CardRepository repository;
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Transactional
     public CardResponse create(CardRequest request) {
+        validarRequest(request);
+
+        Card card = new Card(
+                request.numeroCartao(),
+                passwordEncoder.encode(request.senha())
+        );
+
+        repository.save(card);
+
+        return new CardResponse(card.getNumeroCartao(), card.getSaldo());
+    }
+
+    private void validarRequest(CardRequest request) {
         Optional.ofNullable(request.numeroCartao())
                 .filter(n -> !n.isBlank())
                 .orElseThrow(() ->
@@ -40,12 +55,8 @@ public class CardServiceImpl implements CardService {
                 .ifPresent(card -> {
                     throw new BusinessException(ErrorCode.CARTAO_JA_EXISTENTE);
                 });
-
-        Card card = new Card(request.numeroCartao(), request.senha());
-        repository.save(card);
-
-        return new CardResponse(card.getNumeroCartao(), card.getSenha());
     }
+
     @Transactional()
     public BigDecimal getBalance(String numeroCartao) {
         return repository.findById(numeroCartao)
@@ -59,7 +70,7 @@ public class CardServiceImpl implements CardService {
     public List<CardResponse> getAll() {
         return repository.findAll()
                 .stream()
-                .map(card -> new CardResponse(card.getNumeroCartao(), card.getSenha()))
+                .map(card -> new CardResponse(card.getNumeroCartao(), card.getSaldo()))
                 .toList();
     }
 

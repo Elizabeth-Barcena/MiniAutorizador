@@ -9,11 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,17 +23,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TransactionConcurrencyTest {
 
     @Autowired
-    private CardService cardService;
-    @Autowired
     private TransacoesService transacoesService;
 
     @Autowired
     private CardRepository repository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @BeforeEach
     void setup() {
         repository.deleteAll();
-        Card card = new Card("123", "1234");
+
+        Card card = new Card(
+                "123",
+                passwordEncoder.encode("1234")
+        );
+
         card.debitar(new BigDecimal("490.00"));
         repository.save(card);
     }

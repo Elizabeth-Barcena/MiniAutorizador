@@ -8,12 +8,15 @@ import com.example.MiniAutorizador.exception.ErrorCode;
 import com.example.MiniAutorizador.repository.CardRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TransacoesServiceImpl implements TransacoesService {
     @Autowired
     private CardRepository repository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Transactional
     public void debitar(TransactionRequest request) {
@@ -23,7 +26,7 @@ public class TransacoesServiceImpl implements TransacoesService {
                         new CardNotFoundException()
                 );
 
-        card.validarSenha(request.senha());
+        card.validarSenha(request.senha(), passwordEncoder);
         card.validarSaldo(request.valor());
         card.debitar(request.valor());
     }

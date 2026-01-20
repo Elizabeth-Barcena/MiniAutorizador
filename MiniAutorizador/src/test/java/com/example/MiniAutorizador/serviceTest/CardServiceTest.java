@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -29,25 +30,38 @@ class CardServiceTest {
     private CardServiceImpl service;
 
     private Card card;
-
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
-        card = new Card("123", "1234");
+        card = new Card("123", "$hash");
     }
+
+
     @Test
     void validarSenhaCorreta() {
-        assertDoesNotThrow(() -> card.validarSenha("1234"));
+        Mockito.when(passwordEncoder.matches("1234", "$hash"))
+                .thenReturn(true);
+
+        assertDoesNotThrow(() ->
+                card.validarSenha("1234", passwordEncoder)
+        );
     }
 
     @Test
     void lancarExcecaoParaSenhaIncorreta() {
+        Mockito.when(passwordEncoder.matches("5855", "$hash"))
+                .thenReturn(false);
+
         BusinessException exception = assertThrows(
                 BusinessException.class,
-                () -> card.validarSenha(new String("5855"))
+                () -> card.validarSenha("5855", passwordEncoder)
         );
+
         assertEquals(ErrorCode.SENHA_INVALIDA, exception.getErrorCode());
     }
+
     @Test
     void validarSaldoSuficiente() {
         assertDoesNotThrow(() ->
