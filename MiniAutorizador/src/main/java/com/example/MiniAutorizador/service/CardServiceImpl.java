@@ -7,6 +7,7 @@ import com.example.MiniAutorizador.entity.Card;
 import com.example.MiniAutorizador.exception.CardNotFoundException;
 import com.example.MiniAutorizador.repository.CardRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -15,11 +16,9 @@ import java.util.List;
 @Service
 public class CardServiceImpl implements CardService {
 
-    private final CardRepository repository;
+    @Autowired
+    private  CardRepository repository;
 
-    public CardServiceImpl(CardRepository repository) {
-        this.repository = repository;
-    }
 
     @Transactional
     public CardResponse create(CardRequest request) {
