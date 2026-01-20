@@ -1,5 +1,7 @@
 package com.example.MiniAutorizador.entity;
 
+import com.example.MiniAutorizador.exception.BusinessException;
+import com.example.MiniAutorizador.exception.ErrorCode;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -39,13 +41,19 @@ public class Card {
         return saldo;
     }
 
-    public boolean senhaValida(String senhaInformada) {
-        return Objects.equals(this.senha, senhaInformada);
+    public void validarSenha(String senhaInformada) {
+        if (!Objects.equals(this.senha, senhaInformada)) {
+            throw new BusinessException(ErrorCode.SENHA_INVALIDA);
+        }
     }
 
-    public boolean possuiSaldo(BigDecimal valor) {
-        return saldo.compareTo(valor) >= 0;
+
+    public void validarSaldo(BigDecimal valor) {
+        if (saldo.compareTo(valor) < 0) {
+            throw new BusinessException(ErrorCode.SALDO_INSUFICIENTE);
+        }
     }
+
 
     public void debitar(BigDecimal valor) {
         this.saldo = this.saldo.subtract(valor);
