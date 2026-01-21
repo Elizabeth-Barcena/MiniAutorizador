@@ -47,6 +47,11 @@ public class Card {
             throw new BusinessException(ErrorCode.SENHA_INVALIDA);
         }
     }
+    public void validarValor(BigDecimal valor) {
+        if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException(ErrorCode.VALOR_INVALIDO);
+        }
+    }
 
 
     public void validarSaldo(BigDecimal valor) {
