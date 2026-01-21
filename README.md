@@ -3,7 +3,7 @@
 API REST desenvolvida em Java + Spring Boot para simular um autorizador de cartões, responsável por criar cartões, consultar saldo e realizar transações financeiras de forma segura e concorrente.
 
 
-📌 Funcionalidades
+### 📌 Funcionalidades
 
 ✅ Criar cartão
 
@@ -11,11 +11,7 @@ API REST desenvolvida em Java + Spring Boot para simular um autorizador de cart�
 
 ✅ Realizar transações (débito)
 
-✅ Validação de senha
-
-✅ Validação de saldo insuficiente
-
-✅ Tratamento de cartão inexistente
+✅ Validações de senha, saldo, numeros negativos e dados invalidos
 
 ✅ Controle de concorrência (evita débito duplicado)
 
@@ -23,7 +19,9 @@ API REST desenvolvida em Java + Spring Boot para simular um autorizador de cart�
 
 ✅ Testes unitários e de concorrência
 
-🧱 Arquitetura
+✅ Documentação com swagger
+
+### 🧱 Arquitetura
 
 O projeto segue uma arquitetura em camadas:
 
@@ -81,13 +79,13 @@ Exception
 
 - Maven
 
-🗄️ Banco de Dados
+### 🗄️ Banco de Dados
 
 - Banco: MySQL 5.7
 
-Gerenciado via Docker
+- Gerenciado via Docker
 
-Tabela cards
+Tabela card
 
 | Campo         | Tipo            |
 |---------------|-----------------|
@@ -98,7 +96,7 @@ Tabela cards
 
 Saldo inicial padrão: R$ 500,00
 
-🐳 Subindo o banco com Docker
+### 🐳 Subindo o banco com Docker
 
 Dentro da pasta docker:
 
@@ -109,7 +107,7 @@ Verifique se o container está rodando:
 
     docker ps
 
-▶️ Rodando a aplicação
+### ▶️ Rodando a aplicação
 mvn spring-boot:run
 
 
@@ -117,7 +115,7 @@ mvn spring-boot:run
 
     http://localhost:8080
 
-📮 Endpoints
+### 📮 Endpoints
 Criar cartão
 
     POST /cards
@@ -166,31 +164,32 @@ Erros possíveis:
 
     422 – Saldo insuficiente
 
-🔐 Concorrência e Consistência
+    422 - Valor Inválido
+
+### 🔐 Concorrência e Consistência
 
 O sistema foi projetado para evitar double spending.
 
 Cenário testado:
 
-Saldo: R$10,00
+    Saldo: R$10,00
 
 Duas transações simultâneas de R$10,00
 
-✔ Apenas uma transação é aprovada
+- Apenas uma transação é aprovada
 
-✔ A outra falha corretamente
+- A outra falha corretamente
 
-✔ Saldo final = R$0,00
+- Saldo final = R$0,00
 
 Isso é garantido por:
 
-@Transactional
+    @Transactional
 
-Lock pessimista no banco (SELECT ... FOR UPDATE)
+    Lock pessimista no banco (SELECT ... FOR UPDATE)
 
-Teste de concorrência com múltiplas threads
 
-🧪 Testes
+### 🧪 Testes
 
 O projeto possui testes unitários para:
 
@@ -208,11 +207,38 @@ O projeto possui testes unitários para:
 
 7 - Valida se o campo senha esta vazio
 
-8 - Teste de concorrência
+8 - Valida se o numero que foi debitado não é negativo
+
+9 - Valida se o valor debitado não é zero
+
+10 - Teste de concorrência
 
 Rodar os testes 
 
     mvn test
+
+### 📘 Documentação da API (Swagger)
+
+Este projeto disponibiliza uma documentação interativa da API utilizando **Swagger (OpenAPI)**.
+
+Após subir a aplicação, a documentação pode ser acessada em:
+
+🔗 **Swagger UI:**  
+http://localhost:8080/swagger-ui/index.html#
+
+A API utiliza Basic Authentication.
+
+Para acessar os endpoints protegidos via Swagger:
+
+1. Clique no botão Authorize no Swagger UI
+2. Informe:
+    - Username: `username`
+    - Password: `password`
+3. Clique em Authorize
+
+Após isso, os endpoints estarão liberados para teste.
+
+
 
 🧠 Decisões de Design
 
