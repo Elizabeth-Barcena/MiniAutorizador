@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Service
 public class CardServiceImpl implements CardService {
@@ -22,6 +23,8 @@ public class CardServiceImpl implements CardService {
     private  CardRepository repository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    private static final int CARTAO_MIN = 13;
+    private static final int CARTAO_MAX = 19;
 
     @Transactional
     public CardResponse create(CardRequest request) {
@@ -38,6 +41,11 @@ public class CardServiceImpl implements CardService {
     }
 
     private void validarRequest(CardRequest request) {
+        Predicate<String> CARTAO_TAMANHO_VALIDO =
+                numero -> numero.length() >= CARTAO_MIN && numero.length() <= CARTAO_MAX;
+        Predicate<String> CARTAO_APENAS_NUMEROS =
+                numero -> numero.matches("\\d+");
+
         Optional.ofNullable(request.numeroCartao())
                 .filter(n -> !n.isBlank())
                 .orElseThrow(() ->
@@ -50,11 +58,18 @@ public class CardServiceImpl implements CardService {
                         new BusinessException(ErrorCode.SENHA_OBRIGATORIA)
                 );
 
-
         repository.findById(request.numeroCartao())
                 .ifPresent(card -> {
                     throw new BusinessException(ErrorCode.CARTAO_JA_EXISTENTE);
                 });
+        Optional.ofNullable(request.numeroCartao())
+                .filter(n -> !n.isBlank())
+                .filter(CARTAO_APENAS_NUMEROS)
+                .filter(CARTAO_TAMANHO_VALIDO)
+                .orElseThrow(() ->
+                        new BusinessException(ErrorCode.CARTAO_INVALIDO)
+                );
+
     }
 
     @Transactional()
