@@ -142,19 +142,19 @@ Tabela cards
 
 | campo	        | tipo           |
 |---------------|----------------|
-| numero_cartao | VARCHAR(16) PK |
+| numero_cartao | VARCHAR(19) PK |
 | senha         | 	VARCHAR       |
-| saldo         | 	DECIMAL(10,2) |
+| saldo         | 	DECIMAL |
 
 Tabela transaction   
 
-| campo	           | tipo            |
-|------------------|-----------------|
-| id	              | BIGINT PK       |
-| numero_cartao    | VARCHAR(16) FK  |
-| valor	           | DECIMAL  |
-| saldo_resultante | 	DECIMAL |
-| created_at	      | TIMESTAMP       |
+| campo	           | tipo           |
+|------------------|----------------|
+| id	              | BIGINT PK      |
+| numero_cartao    | VARCHAR FK |
+| valor	           | DECIMAL        |
+| saldo_resultante | 	DECIMAL       |
+| created_at	      | TIMESTAMP      |
 
 Saldo inicial padrão: R$ 500,00
 
