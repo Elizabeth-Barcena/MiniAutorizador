@@ -35,7 +35,7 @@ class CardServiceTest {
 
     @BeforeEach
     void setUp() {
-        card = new Card("123", "$hash");
+        card = new Card("1234567891000", "$hash");
     }
 
 
@@ -88,10 +88,10 @@ class CardServiceTest {
     }
     @Test
     void retornaSaldoCorreto() {
-        Mockito.when(repository.findById("123"))
+        Mockito.when(repository.findById("1234567891000"))
                 .thenReturn(Optional.of(card));
 
-        BigDecimal saldo = service.getBalance("123");
+        BigDecimal saldo = service.getBalance("1234567891000");
 
         assertEquals(new BigDecimal("500.00"), saldo);
     }
@@ -110,7 +110,7 @@ class CardServiceTest {
     @Test
     void criarCartaoComSenhaEmBranco() {
 
-        CardRequest request = new CardRequest("123", "");
+        CardRequest request = new CardRequest("1234567891000", "");
 
         BusinessException exception = assertThrows(
                 BusinessException.class,
@@ -139,5 +139,56 @@ class CardServiceTest {
 
         assertEquals(ErrorCode.VALOR_INVALIDO, exception.getErrorCode());
     }
+    @Test
+    void naoDeveCriarCartaoComNumeroMenorQue13() {
+
+        CardRequest request = new CardRequest("123456789012", "1234");
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.create(request)
+        );
+
+        assertEquals(ErrorCode.CARTAO_INVALIDO, exception.getErrorCode());
+    }
+    @Test
+    void naoDeveCriarCartaoComNumeroMaiorQue19() {
+
+        CardRequest request = new CardRequest("12345678901234567890", "1234");
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.create(request)
+        );
+
+        assertEquals(ErrorCode.CARTAO_INVALIDO, exception.getErrorCode());
+    }
+    @Test
+    void deveCriarCartaoCom13Digitos() {
+        CardRequest request = new CardRequest("1234567890123", "1234");
+
+        assertDoesNotThrow(() -> service.create(request));
+    }
+
+    @Test
+    void deveCriarCartaoCom19Digitos() {
+        CardRequest request = new CardRequest("1234567890123456789", "1234");
+
+        assertDoesNotThrow(() -> service.create(request));
+    }
+    @Test
+    void naoDeveCriarCartaoComNumeroNaoNumerico() {
+
+        CardRequest request = new CardRequest("12345ABC678901", "1234");
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.create(request)
+        );
+
+        assertEquals(ErrorCode.CARTAO_INVALIDO, exception.getErrorCode());
+    }
+
+
 
 }
