@@ -25,7 +25,7 @@ public class TransacoesServiceImpl implements TransacoesService {
                 .orElseThrow(() ->
                         new CardNotFoundException()
                 );
-
+        card.validarValor(request.valor());
         card.validarSenha(request.senha(), passwordEncoder);
         card.validarSaldo(request.valor());
         card.debitar(request.valor());

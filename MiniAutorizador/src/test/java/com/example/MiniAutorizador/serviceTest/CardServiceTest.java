@@ -119,5 +119,25 @@ class CardServiceTest {
 
         assertEquals("SENHA_OBRIGATORIA", exception.getErrorCode().name());
     }
+    @Test
+    void naoDevePermitirValorNegativo() {
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> card.validarValor(new BigDecimal("-10.00"))
+        );
+
+        assertEquals(ErrorCode.VALOR_INVALIDO, exception.getErrorCode());
+    }
+    @Test
+    void naoDevePermitirValorZero() {
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> card.validarValor(BigDecimal.ZERO)
+        );
+
+        assertEquals(ErrorCode.VALOR_INVALIDO, exception.getErrorCode());
+    }
 
 }
