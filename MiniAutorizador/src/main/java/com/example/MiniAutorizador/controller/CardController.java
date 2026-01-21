@@ -25,9 +25,9 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/{number}")
-    public ResponseEntity<BigDecimal> getBalance(@PathVariable String number) {
-        return ResponseEntity.ok(service.getBalance(number));
+    @GetMapping("/{numeroCartao}")
+    public ResponseEntity<String> getBalance(@PathVariable String numeroCartao) {
+        return ResponseEntity.ok(service.getBalance(numeroCartao).toString());
     }
 
     @GetMapping

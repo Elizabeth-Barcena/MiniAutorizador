@@ -3,8 +3,9 @@ package com.example.MiniAutorizador.entity;
 import com.example.MiniAutorizador.exception.BusinessException;
 import com.example.MiniAutorizador.exception.ErrorCode;
 import jakarta.persistence.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.math.BigDecimal;
-import java.util.Objects;
+
 
 @Entity
 @Table(name = "cards")
@@ -41,8 +42,8 @@ public class Card {
         return saldo;
     }
 
-    public void validarSenha(String senhaInformada) {
-        if (!Objects.equals(this.senha, senhaInformada)) {
+    public void validarSenha(String senhaInformada, PasswordEncoder passwordEncoder) {
+        if (!passwordEncoder.matches(senhaInformada, this.senha)) {
             throw new BusinessException(ErrorCode.SENHA_INVALIDA);
         }
     }
