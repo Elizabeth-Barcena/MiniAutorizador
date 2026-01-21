@@ -24,6 +24,8 @@ class TransactionConcurrencyTest {
 
     @Autowired
     private TransacoesService transacoesService;
+    @Autowired
+    private CardService cardService;
 
     @Autowired
     private CardRepository repository;
@@ -36,7 +38,7 @@ class TransactionConcurrencyTest {
         repository.deleteAll();
 
         Card card = new Card(
-                "123",
+                "1234567890000",
                 passwordEncoder.encode("1234")
         );
 
@@ -52,7 +54,7 @@ class TransactionConcurrencyTest {
         Runnable tarefa = () -> {
             try {
                 transacoesService.debitar(new TransactionRequest(
-                        "123",
+                        "1234567890000",
                         "1234",
                         new BigDecimal("10.00")
                 ));
@@ -67,11 +69,12 @@ class TransactionConcurrencyTest {
 
         latch.await();
 
-        Card cardFinal = repository.findById("123").orElseThrow();
+        Card cardFinal = repository.findById("1234567890000").orElseThrow();
 
         assertEquals(
                 0,
                 cardFinal.getSaldo().compareTo(BigDecimal.ZERO)
         );
+        cardService.delete("1234567890000");
     }
 }

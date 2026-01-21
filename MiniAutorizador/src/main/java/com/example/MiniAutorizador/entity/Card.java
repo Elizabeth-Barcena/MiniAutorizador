@@ -5,6 +5,8 @@ import com.example.MiniAutorizador.exception.ErrorCode;
 import jakarta.persistence.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -12,14 +14,27 @@ import java.math.BigDecimal;
 public class Card {
 
     @Id
-    @Column(name = "numero_cartao", nullable = false, unique = true, length = 16)
+    @Column(name = "numero_cartao", nullable = false, unique = true, length = 19)
     private String numeroCartao;
 
     @Column(nullable = false)
     private String senha;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false)
     private BigDecimal saldo;
+
+    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions = new ArrayList<>();
+
+    public void registrarTransacao(BigDecimal valorDebitado) {
+        Transaction transaction = new Transaction(
+                this,
+                valorDebitado,
+                this.saldo
+        );
+        this.transactions.add(transaction);
+    }
+
 
     protected Card() {
     }

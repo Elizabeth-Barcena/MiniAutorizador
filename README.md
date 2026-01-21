@@ -17,9 +17,62 @@ API REST desenvolvida em Java + Spring Boot para simular um autorizador de cart�
 
 ✅ Padronização de erros via ErrorCode
 
-✅ Testes unitários e de concorrência
+✅ Testes unitários, end-to-end e de concorrência
 
 ✅ Documentação com swagger
+
+### 📌 Requisitos Funcionais
+Cartões
+
+- O sistema deve permitir a criação de cartões de débito.
+
+- O número do cartão deve conter apenas dígitos numéricos.
+
+- O número do cartão deve possuir no mínimo 13 e no máximo 19 dígitos.
+
+- Não deve ser permitido criar um cartão com número vazio ou nulo.
+
+- Não deve ser permitido criar um cartão com senha vazia ou nula.
+
+- Não deve ser permitido criar mais de um cartão com o mesmo número.
+
+- Todo cartão criado deve iniciar com saldo padrão de R$ 500,00.
+
+- O sistema deve permitir consultar o saldo de um cartão existente.
+
+- O sistema deve permitir excluir um cartão existente.
+
+Transações
+
+- O sistema deve permitir realizar transações de débito em um cartão existente.
+
+Uma transação deve conter:
+
+      - número do cartão
+      - senha
+      - valor a ser debitado
+
+- Não deve ser permitido realizar transações com cartão inexistente.
+
+- Não deve ser permitido realizar transações com senha inválida.
+
+- Não deve ser permitido realizar transações com saldo insuficiente.
+
+- Não deve ser permitido realizar transações com valor zero ou negativo.
+
+- Quando uma transação for autorizada, o valor deve ser debitado do saldo do cartão.
+
+  - O sistema deve persistir as transações realizadas, armazenando:
+
+        número do cartão
+      
+        valor debitado
+      
+        saldo após a transação
+      
+        data/hora da transação
+
+- O sistema deve permitir consultar todas as transações de um cartão.
 
 ### 🧱 Arquitetura
 
@@ -55,7 +108,7 @@ Exception
 
 - Uso de ErrorCode para padronização
 
-⚙️ Tecnologias Utilizadas
+### ⚙️ Tecnologias Utilizadas
 
 - Java 21
 
@@ -85,16 +138,27 @@ Exception
 
 - Gerenciado via Docker
 
-Tabela card
+Tabela cards
 
-| Campo         | Tipo            |
-|---------------|-----------------|
-| numero_cartao | VARCHAR(16) PK  |
-| senha         | VARCHAR         |
-| saldo         | DECIMAL(10,2)   |
+| campo	        | tipo           |
+|---------------|----------------|
+| numero_cartao | VARCHAR(16) PK |
+| senha         | 	VARCHAR       |
+| saldo         | 	DECIMAL(10,2) |
 
+Tabela transaction   
+
+| campo	           | tipo            |
+|------------------|-----------------|
+| id	              | BIGINT PK       |
+| numero_cartao    | VARCHAR(16) FK  |
+| valor	           | DECIMAL  |
+| saldo_resultante | 	DECIMAL |
+| created_at	      | TIMESTAMP       |
 
 Saldo inicial padrão: R$ 500,00
+
+A relação da tabela de transação de é 1:N com o cartão.
 
 ### 🐳 Subindo o banco com Docker
 
@@ -120,7 +184,7 @@ Criar cartão
 
     POST /cards
     {
-    "numeroCartao": "123456789",
+    "numeroCartao": "123456789000000",
     "senha": "1234"
     }
 
@@ -166,7 +230,9 @@ Erros possíveis:
 
     422 - Valor Inválido
 
-### 🔐 Concorrência e Consistência
+    422 - Cartão Invalido
+
+### 🔐 Teste de Concorrência e Consistência
 
 O sistema foi projetado para evitar double spending.
 
@@ -189,7 +255,7 @@ Isso é garantido por:
     Lock pessimista no banco (SELECT ... FOR UPDATE)
 
 
-### 🧪 Testes
+### 🧪 Testes Unitários
 
 O projeto possui testes unitários para:
 
@@ -211,11 +277,29 @@ O projeto possui testes unitários para:
 
 9 - Valida se o valor debitado não é zero
 
-10 - Teste de concorrência
+10 - Valida se cria cartão com 13 digitos
 
-Rodar os testes 
+11 - Valida se cria cartão com menos de 13 digitos
 
-    mvn test
+12 - Valida se cria cartão com 19 digitos
+
+13 - Valida se cria cartão com mais de 19 digitos
+
+14 - Valida se o sistema aceita valor 0
+
+15 - Valida se cria carão com alfabeticos
+
+### Teste end-to-end
+Este projeto possui testes end-to-end (E2E) que validam o fluxo completo da aplicação, simulando o comportamento real de um consumidor da API.
+
+Os testes E2E garantem que:
+
+- A aplicação esteja corretamente integrada (Controller, Service, Repository, Banco de Dados e Segurança)
+
+- As regras de negócio funcionem de ponta a ponta
+
+- Os contratos HTTP (status codes e responses) sejam respeitados
+
 
 ### 📘 Documentação da API (Swagger)
 
