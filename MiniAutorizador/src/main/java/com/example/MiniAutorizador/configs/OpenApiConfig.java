@@ -17,12 +17,18 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Mini Autorizador API")
                         .description("API para criação de cartões e autorização de transações")
-                        .version("1.0.0"))
+                        .version("1.0.0")
+                )
                 .components(new Components()
-                        .addSecuritySchemes("basicAuth",
+                        .addSecuritySchemes(
+                                "basicAuth",
                                 new SecurityScheme()
                                         .type(SecurityScheme.Type.HTTP)
-                                        .scheme("basic")))
-                .addSecurityItem(new SecurityRequirement().addList("basicAuth"));
+                                        .scheme("basic")
+                        )
+                )
+                .addSecurityItem(
+                        new SecurityRequirement().addList("basicAuth")
+                );
     }
 }
